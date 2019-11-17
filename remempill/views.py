@@ -115,7 +115,7 @@ class Index(View):
             #     from_="+12029154283",
             #     body="pou den irthes")
             # call = client.calls.create(
-            #     url='http://3afbbe04.ngrok.io/dynamic_call_creator/15',
+            #     url='http://922028b4.ngrok.io/dynamic_call_creator/15',
             #     to='+18572874360',
             #     from_='+12029154283'
             # )
@@ -138,7 +138,7 @@ class Index(View):
             consumptions_of_the_hour = get_consumptions_of_the_hour(timezone.now())
 
             for consumption in consumptions_of_the_hour:
-                target = 'http://3afbbe04.ngrok.io/dynamic_call_creator/' + str(consumption.id)
+                target = 'http://922028b4.ngrok.io/dynamic_call_creator/' + str(consumption.id)
                 print("tipwnw")
                 print(consumption.pill.owner.phone)
                 call = client.calls.create(
@@ -258,12 +258,12 @@ def dynamic_call_creator(request, consumption_id):
     resp = VoiceResponse()
 
     # Start our <Gather> verb
-    action = "http://3afbbe04.ngrok.io/callresponse/" + consumption_id
+    action = "http://922028b4.ngrok.io/callresponse/" + consumption_id
     gather = Gather(num_digits=1, actionOnEmptyResult="true", action=action, timeout=10)
     consumption = PillConsumption.objects.get(pk=int(consumption_id))
     pill = consumption.pill
     elder = pill.owner
-    saying = elder.greeting_message + '! Please press five after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
+    saying = elder.greeting_message + '! Please a number after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
     saying += pill.color + ' pill that has a ' + pill.size + ' size ' + ' and its shape is ' + pill.shape
     gather.say(saying)
     resp.append(gather)
