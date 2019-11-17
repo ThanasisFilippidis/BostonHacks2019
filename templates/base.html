@@ -32,7 +32,7 @@
                 <div class="navbar-collapse collapse w-100" id="collapse">
                     <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
                         <!-- Show login navbar: -->
-                        {% if user %}
+                        {% if not user %}
                             <li class="nav-item">
                                 <a class="nav-link" href="" id="tipsheet">My Tipsheet</a>
                             </li>

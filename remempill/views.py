@@ -1,6 +1,6 @@
 from django.contrib import auth
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -17,7 +17,7 @@ class Index(View):
     template_name = '../templates/index.html'
 
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, context={'user': 'user'})
 
     @method_decorator(csrf_protect)
     def post(self, request):
@@ -37,13 +37,14 @@ class Index(View):
                 # set cookie to transfer user name to login success page.
                 # response.set_cookie('user_name', user_name, 3600)
                 content = {'message': 'Hello, World!'}
-                return render('', user)
+                print(user)
+                return render(request, self.template_name, context={'user': user})
                 # return HttpResponse(user.get_id())
             else:
                 error_json = {'error_message': 'User name or password is not correct.'}
                 # return render(request, 'https://www.facebook.com/', error_json)
                 # content = {'message': 'Wrong password!'}
-                # return Response(content)
+                return render('', context={'user': None})
         # post request for Registering a new user
         elif request.POST['button'] == "Register":
             print("ELA MWRE2")
@@ -171,4 +172,5 @@ def callresponse(request, consumption_id):
 @csrf_exempt
 def logout(request):
     auth.logout(request)
-    return redirect('index/')
+    # return redirect('/')
+    return HttpResponseRedirect('/remempill')
