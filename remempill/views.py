@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -12,6 +13,8 @@ from twilio.twiml.voice_response import VoiceResponse, Gather, Say
 from .models import Pill, PillConsumption
 from django.views.decorators.csrf import csrf_protect
 from django.template.defaulttags import register
+
+import datetime
 
 
 class Index(View):
@@ -100,14 +103,34 @@ class Index(View):
             #     to="+18574729477",
             #     from_="+12029154283",
             #     body="Gamiesai pou den irthes")
-            call = client.calls.create(
-                url='http://a5570db5.ngrok.io/remempill/dynamic_call_creator/1',
-                to='+18572874360',
-                from_='+12029154283'
-            )
+            # call = client.calls.create(
+            #     url='http://a5570db5.ngrok.io/remempill/dynamic_call_creator/1',
+            #     to='+18572874360',
+            #     from_='+12029154283'
+            # )
+            print("EEEEEEEEEE")
+            min_time = timezone.now()
+            max_time = min_time + datetime.timedelta(hours=0, minutes=59, seconds=59)
+            print(min_time)
+            print(max_time)
+            if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(pk=2).time_to_consume <= max_time:
+                print("prepei")
+            else:
+                print("den prepei")
+            #print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
 
-            print(call.sid)
+            # print(call.sid)
             return HttpResponse('User account exist, please register another one.')
+
+
+class Pillcase(View):
+    template_name = '../templates/pillcase.html'
+
+    def get(self, request, elder_id):
+        print(elder_id)
+
+    def post(self, request, elder_id):
+        print(elder_id)
 
 
 @csrf_exempt
@@ -151,16 +174,16 @@ def get_times(dictionary, key):
 hours = []
 
 
-def pillcase(request):
-    return render(request, '../templates/pillcase.html',
-                  {'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday'],
-                   'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': ['pill1', 'pill2'],
-                   'pillsPerDay': [{'Monday': {'Noon': ['pill1', 'pill2'], 'Morning': ['pill1', 'pill2'],
-                                               'Afternoon': [], 'Before Bed': []}}],
-                   'hours': {'Morning': ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00'],
-                             'Noon': ['12:00', '13:00', '14:00'],
-                             'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
-                             'Before Bed': ['20:00', '21:00', '22:00', '23:00', '00:00']}})
+# def pillcase(request):
+#     return render(request, '../templates/pillcase.html',
+#                   {'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday'],
+#                    'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': ['pill1', 'pill2'],
+#                    'pillsPerDay': [{'Monday': {'Noon': ['pill1', 'pill2'], 'Morning': ['pill1', 'pill2'],
+#                                                'Afternoon': [], 'Before Bed': []}}],
+#                    'hours': {'Morning': ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00'],
+#                              'Noon': ['12:00', '13:00', '14:00'],
+#                              'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
+#                              'Before Bed': ['20:00', '21:00', '22:00', '23:00', '00:00']}})
 
 
 @csrf_exempt
