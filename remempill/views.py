@@ -148,7 +148,7 @@ class Pillcase(View):
         toBeConsumed = []
         for item in pills:
             print(item.name)
-            temp = PillConsumption.objects.filter(pill=item)
+            temp = PillConsumption.objects.filter(pill=item).filter(time_to_consume__day='Monday')
             for ite in temp:
                 toBeConsumed.append(ite)
 
@@ -353,7 +353,7 @@ def addElderly(request):
     elderly = GrandParent(name=name, surname=surname, phone=phone, greeting_message=greeting, care_taker=caretaker)
     elderly.save()
 
-    return redirect("profiles", request)
+    return HttpResponseRedirect("/profiles")
 
 
 @csrf_exempt
