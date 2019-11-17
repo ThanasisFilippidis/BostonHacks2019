@@ -18,8 +18,8 @@
             <div class="container">
                 <div class="row">
                     {% for profile in profiles %}
-                        <form method="post" class="col-lg-6 col-md-6 col-sm-6 col-xs-12" action="{% url 'goToPillcase' %}"
-                              style="border: 2px solid lightgray;">
+                        <form method="post" class="col-lg-6 col-md-12 col-sm-12 col-xs-12" action="{% url 'goToPillcase' %}"
+                              style="border: 2px solid lightgray; padding: 10px;">
                             {% csrf_token %}
 {#                            <div >#}
                                 <h4>{{ profile.name }} {{ profile.surname }} {{ profile.id }}</h4>

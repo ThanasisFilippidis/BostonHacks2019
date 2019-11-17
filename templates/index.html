@@ -10,10 +10,10 @@
 {#{% endblock %}#}
 
 {% block body_block %}
-    <div class="container">
-        <h2>Welcome to <span
-                class="blue">Remem</span><span class="red">Pill</span></h2>
-        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <div>
+
+        <div id="myCarousel" class="carousel slide" data-ride="carousel"
+             style="width: 100%;height: auto; top:20px">
             <!-- Indicators -->
             <ol class="carousel-indicators">
                 <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
@@ -22,9 +22,10 @@
             </ol>
 
             <!-- Wrapper for slides -->
-            <div class="carousel-inner">
+            <div class="carousel-inner" style="height: 100%;width: 100%">
                 <div class="item active">
-                    <img src="{% static "/images/grandpaphone.jpg" %}" alt="Los Angeles" style="width:100%;">
+                    <img src="{% static "/images/grandpaphone.jpg" %}" alt="Los Angeles"
+                         style="width:100%; object-fit: cover">
                 </div>
 
                 <div class="item">
@@ -47,7 +48,9 @@
             </a>
         </div>
     </div>
-
+    <h2 style="position: absolute;top:40%; width:60%; left:20%; right:20%;text-align:center; background-color: rgba(255, 255, 255, 0.4);;padding:50px 0">
+        Welcome to <span
+            class="blue">Remem</span><span class="red">Pill</span></h2>
     <form class="form-inline" method="post">
         {% csrf_token %}
         <button id="otherbtn" type="submit" name="button" class="btn btn-sm btn-info randTip" value="send sms">send sms
@@ -80,7 +83,8 @@
 
                         <div class="md-form mb-4">
                             <i class="fas fa-lock prefix grey-text"></i>
-                            <input type="password" id="defaultForm-pass" class="form-control validate" name="user_password">
+                            <input type="password" id="defaultForm-pass" class="form-control validate"
+                                   name="user_password">
                             <label data-error="wrong" data-success="right" for="defaultForm-pass">Your password</label>
                         </div>
 
@@ -122,7 +126,8 @@
 
                         <div class="md-form mb-4">
                             <i class="fas fa-lock prefix grey-text"></i>
-                            <input type="password" id="defaultForm-pass" class="form-control validate" name="user_password">
+                            <input type="password" id="defaultForm-pass" class="form-control validate"
+                                   name="user_password">
                             <label data-error="wrong" data-success="right" for="defaultForm-pass">Your password</label>
                         </div>
 

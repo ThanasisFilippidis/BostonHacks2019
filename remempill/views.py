@@ -18,14 +18,15 @@ from django.template.defaulttags import register
 import datetime
 
 from redis import Redis
-from rq_scheduler import Scheduler
 
+# from rq_scheduler import Scheduler
 
 # Open a connection to your Redis server.
 redis_server = Redis(host="localhost", port=6379)
 
+
 # Create a scheduler object with your Redis server.
-scheduler = Scheduler(connection=redis_server)
+# scheduler = Scheduler(connection=redis_server)
 
 
 class Index(View):
@@ -113,43 +114,28 @@ class Index(View):
             # message = client.messages.create(
             #     to="+18574729477",
             #     from_="+12029154283",
-            #     body="pou den irthes")
+            #     body="Gamiesai pou den irthes")
             # call = client.calls.create(
-            #     url='http://922028b4.ngrok.io/dynamic_call_creator/15',
+            #     url='http://a5570db5.ngrok.io/remempill/dynamic_call_creator/1',
             #     to='+18572874360',
             #     from_='+12029154283'
             # )
 
-            # min_time = timezone.now()
-            # max_time = min_time - datetime.timedelta(hours=0, minutes=0, seconds=59)
+            min_time = timezone.now()
+            max_time = min_time - datetime.timedelta(hours=0, minutes=0, seconds=59)
             # print(min_time)
             # print(max_time)
             # if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(pk=2).time_to_consume <= max_time:
             #     print("prepei")
             # else:
             #     print("den prepei")
-            # pill = Pill.objects.get(pk=1)
-            # new_cons = PillConsumption(pill=pill, time_to_consume= max_time, consumed=False)
-            # new_cons.save()
-            # add_to_queue("+18572874360", new_cons)
-            #print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
+            pill = Pill.objects.get(pk=1)
+            new_cons = PillConsumption(pill=pill, time_to_consume=max_time, consumed=False)
+            new_cons.save()
+            add_to_queue("+18572874360", new_cons)
+            # print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
 
             # print(call.sid)
-            consumptions_of_the_hour = get_consumptions_of_the_hour(timezone.now())
-
-            for consumption in consumptions_of_the_hour:
-                target = 'http://922028b4.ngrok.io/dynamic_call_creator/' + str(consumption.id)
-                print("tipwnw")
-                print(consumption.pill.owner.phone)
-                call = client.calls.create(
-                    url=target,
-                    to=str(consumption.pill.owner.phone),#'+18572874360',
-                    from_='+12029154283'
-                )
-                message = client.messages.create(
-                    to=str(consumption.pill.owner.phone),
-                    from_="+12029154283",
-                    body=target)
             return HttpResponse('User account exist, please register another one.')
 
 
@@ -162,16 +148,22 @@ class Pillcase(View):
         toBeConsumed = []
         for item in pills:
             print(item.name)
-            toBeConsumed.append(PillConsumption.objects.filter(pill=item))
+            temp = PillConsumption.objects.filter(pill=item)
+            for ite in temp:
+                toBeConsumed.append(ite)
 
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday']
-        times = ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00', '12:00', '13:00', '14:00', '15:00', '16:00',
+        times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
                  '17:00', '18:00', '19:00' '20:00', '21:00', '22:00', '23:00', '00:00']
 
+        print("lala", toBeConsumed)
+        pillsPerDay = {}
         for day in days:
+            day = []
             for hour in times:
+                hour = []
                 for pill in toBeConsumed:
-                    print(pill.time_to_consume)
+                    print(pill.time_to_consume.weekday())
 
         elder = GrandParent.objects.get(id=elder_id)
         print(elder)
@@ -207,9 +199,9 @@ class Pillcase(View):
         print(newPill)
         newPill.save()
 
-        days = request.POST.get('days')#[Monday,..]
-        times = request.POST.get('times')#[20:00...]
-
+        days = request.POST.getlist('days')  # [Monday,..]
+        times = request.POST.getlist('times')  # [20:00...]
+        print(times)
         int_days = days_to_num(days)
         int_hours = intify_hours(times)
 
@@ -217,9 +209,13 @@ class Pillcase(View):
 
         for day in int_days:
             for hour in int_hours:
-                t_delta = today + datetime.timedelta(hours=day*24 + hour, minutes=0, seconds=0)
+                t_delta = today + datetime.timedelta(hours=day * 24 + hour, minutes=0, seconds=0)
                 new_pill_consumption = PillConsumption(pill=newPill, time_to_consume=t_delta)
                 print(new_pill_consumption)
+                new_pill_consumption.save()
+
+        # print(days)
+        # print(times)
 
         target = "/pillcase/" + str(elder_id)
 
@@ -229,6 +225,7 @@ class Pillcase(View):
 def intify_hours(hours):
     int_hours = []
     for hour in hours:
+        # print(hour)
         int_hours.append(int(hour[0:2]))
     return int_hours
 
@@ -258,12 +255,11 @@ def dynamic_call_creator(request, consumption_id):
     resp = VoiceResponse()
 
     # Start our <Gather> verb
-    action = "http://922028b4.ngrok.io/callresponse/" + consumption_id
+    action = "http://3afbbe04.ngrok.io/remempill/callresponse/" + consumption_id
     gather = Gather(num_digits=1, actionOnEmptyResult="true", action=action, timeout=10)
     consumption = PillConsumption.objects.get(pk=int(consumption_id))
     pill = consumption.pill
-    elder = pill.owner
-    saying = elder.greeting_message + '! Please a number after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
+    saying = 'Hey grandpa! Please press five after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
     saying += pill.color + ' pill that has a ' + pill.size + ' size ' + ' and its shape is ' + pill.shape
     gather.say(saying)
     resp.append(gather)
@@ -271,6 +267,7 @@ def dynamic_call_creator(request, consumption_id):
     resp.append(say)
 
     print(resp)
+    # return HttpResponse('User account exist, please register another one.')
 
     return HttpResponse(resp)
 
@@ -287,7 +284,7 @@ def get_item(dictionary, key):
 def get_times(dictionary, key):
     # print(key)
     # print("key is ", key)
-    print(dictionary.get(key))
+    # print(dictionary.get(key))
     return dictionary.get(key)
 
 
@@ -384,7 +381,6 @@ def get_consumptions_of_the_hour(curr_time):
     for consumption in PillConsumption.objects.all():
         if min_time <= consumption.time_to_consume < max_time:
             consumptions.append(consumption)
-    return consumptions
 
 
 def add_to_queue(phone_number, pill_consumption):
@@ -396,8 +392,8 @@ def add_to_queue(phone_number, pill_consumption):
 
     print("I will kick off at: " + str(consumption_datetime))
 
-    scheduler.enqueue_at(consumption_datetime,
-                         notify_subscriber, phone_number)
+    # scheduler.enqueue_at(consumption_datetime,
+    #                      notify_subscriber, phone_number)
 
     # print('{} will be notified when ISS passes by {}, {}'
     #       .format(phone_number, lat, lon))
