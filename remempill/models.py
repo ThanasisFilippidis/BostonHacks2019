@@ -133,8 +133,8 @@ class Pill(models.Model):
 
     owner = models.ForeignKey(GrandParent, on_delete=models.CASCADE, related_name="pill")
 
-    def __str__(self):
-        return str(self.owner) + "'s " + self.name
+    # def __str__(self):
+    #     return str(self.owner) + "'s " + self.name
 
 
 class PillConsumption(models.Model):

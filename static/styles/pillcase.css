@@ -227,8 +227,13 @@ html, body {
     max-height: 250px;
     border-radius: 0;
     border: none;
-    margin: 10px !important;
+    margin: 5px !important
 
+}
+
+form {
+    padding-left: 0 !important;
+    padding-right: 0 !important
 }
 
 .info {

@@ -1,6 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, render_to_response
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -10,7 +11,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse, Gather, Say
 
-from .models import Pill, PillConsumption
+from .models import Pill, PillConsumption, GrandParent
 from django.views.decorators.csrf import csrf_protect
 from django.template.defaulttags import register
 
@@ -48,7 +49,7 @@ class Index(View):
                 print(user)
                 user_name = auth.get_user(request).username
                 request.session['user_name'] = user_name
-                #print(type(user_name))
+                # print(type(user_name))
                 return render(request, self.template_name, {'user': user_name})
                 # return HttpResponse(user.get_id())
             else:
@@ -113,11 +114,12 @@ class Index(View):
             max_time = min_time + datetime.timedelta(hours=0, minutes=59, seconds=59)
             print(min_time)
             print(max_time)
-            if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(pk=2).time_to_consume <= max_time:
+            if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(
+                    pk=2).time_to_consume <= max_time:
                 print("prepei")
             else:
                 print("den prepei")
-            #print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
+            # print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
 
             # print(call.sid)
             return HttpResponse('User account exist, please register another one.')
@@ -127,10 +129,62 @@ class Pillcase(View):
     template_name = '../templates/pillcase.html'
 
     def get(self, request, elder_id):
-        print(elder_id)
+        pills = GrandParent.get_pills(elder_id)
+        print(pills)
+        toBeConsumed = []
+        for item in pills:
+            print(item.name)
+            toBeConsumed.append(PillConsumption.objects.filter(pill=item))
+
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday']
+        times = ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00', '12:00', '13:00', '14:00', '15:00', '16:00',
+                 '17:00', '18:00', '19:00' '20:00', '21:00', '22:00', '23:00', '00:00']
+
+        for day in days:
+            for hour in hours:
+                for pill in toBeConsumed:
+                    print(pill.time_to_consume)
+
+        elder = GrandParent.objects.get(id=elder_id)
+        print(elder)
+
+        return render(request, '../templates/pillcase.html',
+                      {'user': elder,
+                       'days': days,
+                       'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': pills,
+                       'pillsPerDay': [{'Monday': {'Noon': ['1', '1'], 'Morning': ['1', '1'],
+                                                   'Afternoon': [], 'Before Bed': []}}],
+                       'hours': {'Morning': ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00'],
+                                 'Noon': ['12:00', '13:00', '14:00'],
+                                 'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
+                                 'Before Bed': ['20:00', '21:00', '22:00', '23:00', '00:00']}, 'exactTimes': times})
+        # print(elder_id)
 
     def post(self, request, elder_id):
-        print(elder_id)
+
+        print(request.POST.get('button'))
+        # print(request.POST.get('name'))
+        print(request.POST.get('button')[len("addToTime"):])
+
+        name = request.POST.get('name')
+        size = request.POST.get('size')
+        color = request.POST.get('color')
+        shape = request.POST.get('shape')
+
+        print(auth.get_user(request))
+
+        print(name, size, color, shape)
+        newPill = Pill(name=name, size=size, color=color, shape=shape, remaining=10,
+                       owner=GrandParent.objects.get(id=elder_id))
+        print(newPill)
+        newPill.save()
+
+        days = request.POST.get('days')
+        times = request.POST.get('times')
+
+        target = "/pillcase/" + str(elder_id)
+
+        return redirect(target)
 
 
 @csrf_exempt
@@ -159,14 +213,14 @@ def dynamic_call_creator(request, consumption_id):
 def get_item(dictionary, key):
     if not dictionary:
         return []
-    print(dictionary)
+    # print(dictionary)
     return dictionary.get(key)
 
 
 @register.filter
 def get_times(dictionary, key):
-    print(key)
-    print("key is ", key)
+    # print(key)
+    # print("key is ", key)
     print(dictionary.get(key))
     return dictionary.get(key)
 
@@ -175,6 +229,13 @@ hours = []
 
 
 # def pillcase(request):
+#
+# def pillcase(request, elder_id):
+#     if request.method == 'POST':
+#         print("hahshahshsa")
+#     else:
+#         print('ajdjajad')
+#
 #     return render(request, '../templates/pillcase.html',
 #                   {'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday'],
 #                    'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': ['pill1', 'pill2'],
@@ -184,7 +245,7 @@ hours = []
 #                              'Noon': ['12:00', '13:00', '14:00'],
 #                              'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
 #                              'Before Bed': ['20:00', '21:00', '22:00', '23:00', '00:00']}})
-
+#
 
 @csrf_exempt
 def callresponse(request, consumption_id):
@@ -199,21 +260,57 @@ def callresponse(request, consumption_id):
         '<Response><Say>I see that you did not take your pill. I will call you back soon</Say></Response>')
 
 
+def addPill(request):
+    print(request)
+
+    return HttpResponseRedirect("pillcase")
+
+
+def profiles(request):
+    caretaker = auth.get_user(request)
+    print("jajaja")
+    result = caretaker.get_elders()
+    print(result)
+
+    return render(request, "../templates/profiles.html", {'profiles': result})
+
+
+def goToPillcase(request):
+    elderId = request.POST.get('button')
+    print(elderId)
+    id = 1
+    target = "/pillcase/" + str(elderId)
+
+    return redirect(target)
+
+
+def addElderly(request):
+    name = request.POST.get('name')
+    surname = request.POST.get('surname')
+    phone = request.POST.get('phone')
+    greeting = request.POST.get('greeting')
+    caretaker = auth.get_user(request)
+
+    elderly = GrandParent(name=name, surname=surname, phone=phone, greeting_message=greeting, care_taker=caretaker)
+    elderly.save()
+
+    return redirect("profiles", request)
+
+
 @csrf_exempt
 def mylogout(request):
     template_name = '../templates/index.html'
     request.session['user_name'] = ""
     auth.logout(request)
     return redirect('index')
-    #return HttpResponseRedirect('/remempill')
-    #return render(request, template_name, context={'user': ""})
-    #return HttpResponseRedirect(reverse('index'))
+    # return HttpResponseRedirect('/remempill')
+    # return render(request, template_name, context={'user': ""})
+    # return HttpResponseRedirect(reverse('index'))
 
 
 def user_session_check(request):
-    #get current user's details and check if he is logged in indeed
+    # get current user's details and check if he is logged in indeed
     try:
         return request.session['user_name']
     except KeyError:
         return None
-

@@ -21,10 +21,10 @@
         {% endblock %}
     </head>
     <body>
-        <p>{{ user }}</p>
+        {#        <p>{{ user }}</p>#}
         {% block navbar %}
             <nav class="site-header sticky-top py-1 navbar navbar-light navbar-expand-md justify-content-center nav-style">
-                <a class="navbar-brand d-flex w-50 mr-auto"><span
+                <a class="navbar-brand d-flex w-50 mr-auto" href="/"><span
                         class="blue">Remem</span><span class="red">Pill</span></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapse">
                     <span class="navbar-toggler-icon"></span>
@@ -34,7 +34,7 @@
                         <!-- Show login navbar: -->
                         {% if user %}
                             <li class="nav-item">
-                                <a class="nav-link" href="" id="tipsheet">My Tipsheet</a>
+                                <a class="nav-link red" href="/profiles">My Pillcases</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'mylogout' %}">Logout</a>

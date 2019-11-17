@@ -1,10 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-    </head>
+    {% extends "base.html" %}
+    {% load static %}
+    {% block head_block %}
+        {% block title %}<title> Elder's Pillcase</title>{% endblock %}
+        {#    <link rel="stylesheet" href="{% static '/style.css' %}">#}
+
+        {#        <link rel="script" href="{% static '/cellTips.js' %}">#}
+
+        {#        <link rel="stylesheet" href="{% static '/styles/helpTip.css' %}">#}
+        {#    <link rel="stylesheet" href="{% a %}"#}
+
+    {% endblock %}
     <body>
-        
+        {% block body_block %}
+
+            <div class="container">
+                <div class="row">
+                    {% for profile in profiles %}
+                        <form method="post" class="col-lg-6 col-md-6 col-sm-6 col-xs-12" action="{% url 'goToPillcase' %}"
+                              style="border: 2px solid lightgray;">
+                            {% csrf_token %}
+{#                            <div >#}
+                                <h4>{{ profile.name }} {{ profile.surname }} {{ profile.id }}</h4>
+                                <button class="btn btn-default" type="submit" name="button"
+                                        style="background-color: lightgray" value={{ profile.id }}>More
+                                </button>
+{#                            </div>#}
+
+
+                        </form>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <form method="post" action="{% url 'addElderly' %}"
+                  style="border-top: 2px solid darkgray; align-content: center; justify-content: center">
+            <div class="container">
+                <h3>Add the information of an elderly person</h3>
+                {% csrf_token %}
+                <div class="container">
+
+                    {#                    <i class="fas prefix grey-text"></i>#}
+                    <label data-error="wrong" data-success="right" for="defaultForm-name">Elder's name</label>
+
+                    <input type="text" id="defaultForm-name" class="form-control validate" name="name">
+                    {#                    <div class="help-tip">#}
+                    {#                        <p>Give the name of the pill as indicated on the box</p>#}
+                    {#                    </div>#}
+
+                    <div>
+                        {#                    <i class="fas prefix grey-text"></i>#}
+                        <label data-error="wrong" data-success="right" for="defaultForm-color">Elder's
+                                                                                               surname</label>
+                        <input type="text" id="defaultForm-color" class="form-control validate" name="surname">
+                    </div>
+
+                    <div>
+                        <label data-error="wrong" data-success="right" for="defaultForm-shape">Elder's
+                                                                                               phone number</label>
+
+                        <input type="text" id="defaultForm-color" class="form-control validate" name="phone">
+                    </div>
+
+                    <div>
+                        <div>
+                            <label data-error="wrong" data-success="right" for="defaultForm-shape">Greeting when
+                                                                                                   calling</label>
+
+                            <input type="text" id="defaultForm-color" class="form-control validate" name="greeting">
+                        </div>
+                    </div>
+                    {#                    <i class="fas fa-lock prefix grey-text"></i>#}
+                </div>
+            </div>
+            <div class="container">
+                <button class="btn btn-default" type='submit' name='button' value="Add"
+                        style="align-self:center; color:green">
+                    + Add information
+                </button>
+            </div>
+        {% endblock %}
+        {% block js_block %}
+            <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+            {% csrf_token %}
+
+            <script type='text/javascript' src="{% static 'javascript/pillsHandling.js' %}">
+            </script>
+        {% endblock %}
+        </form>
     </body>
 </html>

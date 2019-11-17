@@ -15,7 +15,8 @@
 
 
     {% block body_block %}
-        <div class="container" id="tipsheetname">User's Pillcase</div>
+        <div class="container" id="tipsheetname"><span class="blue">{{ user.name }} {{ user.surname }}</span>'s Pillcase
+        </div>
         <div id="content">
             <table id="tipstable" class="table table-bordered">
                 <thead>
@@ -73,15 +74,21 @@
 
                             <div class="selected col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <div class="row">
-                                    <h2>Your tips:</h2>
+                                    <h2>Pills for this day and time</h2>
                                 </div>
                                 <div id="selected" class="row">
                                     <div class=" col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                        <div class="card">School friends.<p></p>
-                                            <button type="button" class="btn btn"
-                                                    style="width:100%; padding: 0; margin: 0; background-color: darkgray; ">
-                                                More
-                                            </button>
+                                        <div class="card">
+
+                                            <div class="info">
+                                                <h3>
+                                                    aa
+                                                </h3>
+                                                <p>round</p>
+                                                <p>aa</p>
+                                                <p>tiny</p>
+                                            </div>
+
                                             <button id="1-2-16" class="deletion btn btn-danger"
                                                     style="width:100%; padding: 0; margin: 0;">Remove
                                             </button>
@@ -99,11 +106,11 @@
                                             <div class="card">
                                                 <div class="info">
                                                     <h3>
-                                                        {{ pill }}
+                                                        {{ pill.name }}
                                                     </h3>
-                                                    <p>shape</p>
-                                                    <p>color</p>
-                                                    <p>size</p>
+                                                    <p>{{ pill.shape }}</p>
+                                                    <p>{{ pill.color }}</p>
+                                                    <p>{{ pill.size }}</p>
 
 
                                                     {% csrf_token %}
@@ -120,10 +127,17 @@
 
 
                                                 </div>
-                                                <button type="submit" class="btn btn-success" name="addPill"
-                                                        value="addPill" style="width:100%; padding: 0; margin: 0; ">
-                                                    Add {{ pill }}
+                                                <button class="btn btn-default" type='submit' name='button'
+                                                        value="addToTime{{ pill.name }}"
+                                                        style="align-self:center; color:green">
+                                                    + Add {{ pill.name }} to time
                                                 </button>
+
+
+                                                {#                                                <button type="submit" class="btn btn-success" name="pill{{ pill }}"#}
+                                                {#                                                        value="addToTime" style="width:100%; padding: 0; margin: 0; ">#}
+                                                {#                                                    Add {{ pill }}#}
+                                                {#                                                </button>#}
                                             </div>
 
                                         </form>
@@ -143,66 +157,91 @@
                 </div>
             </div>
         </div>
-        <form method="post">
-            {% csrf_token %}
-            <div class="modal-body mx-3">
-                <div class="md-form mb-5">
+        <form method="post"
+              style="border-top: 2px solid darkgray; align-content: center; justify-content: center">
+            <div class="container">
+                <h3>Add a new pill</h3>
+                {% csrf_token %}
+                <div class="container">
+
                     {#                    <i class="fas prefix grey-text"></i>#}
                     <label data-error="wrong" data-success="right" for="defaultForm-name">Pill's
                                                                                           name</label>
 
-                    <input type="text" id="defaultForm-name" class="form-control validate">
+                    <input type="text" id="defaultForm-name" class="form-control validate" name="name">
                     <div class="help-tip">
                         <p>Give the name of the pill as indicated on the box</p>
                     </div>
-                </div>
 
-                <div class="md-form mb-5">
+
                     {#                    <i class="fas prefix grey-text"></i>#}
                     <label data-error="wrong" data-success="right" for="defaultForm-color">Pill's
                                                                                            name</label>
-                    <input type="text" id="defaultForm-color" class="form-control validate">
+                    <input type="text" id="defaultForm-color" class="form-control validate" name="color">
 
-                </div>
 
-                <div class="md-form mb-4">
-                    <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
-                                                                                           shape</label>
-                    <br>
-                    <select id="defaultForm-shape" name="shape">
-                        <option value="round">Round</option>
-                        <option value="oval">Oval</option>
-                        <option value="capsule">Capsel</option>
-                    </select>
+                    <div>
+                        <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
+                                                                                               shape</label>
+                        <br>
+                        <select id="defaultForm-shape" name="shape">
+                            <option value="round">Round</option>
+                            <option value="oval">Oval</option>
+                            <option value="capsule">Capsel</option>
+                        </select>
+                    </div>
 
+                    <div>
+                        <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
+                                                                                               size</label>
+                        <br>
+                        <select id="defaultForm-shape" name="size">
+                            <option value="tiny">Very Small</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+
+                    <div>
+
+
+                        <label data-error="wrong" data-success="right" for="defaultForm-days">Days to take the
+                                                                                              following pill</label>
+
+
+                        <select id="defaultForm-days" class="custom-select" name="days" multiple>
+                            {% for day in days %}
+                                <option value="{{ day }}">{{ day }}</option>
+
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+
+
+                        <label data-error="wrong" data-success="right" for="defaultForm-times">Days to take the
+                                                                                               following pill</label>
+
+
+                        <select id="defaultForm-times" class="custom-select" name="times" multiple>
+                            {% for exactTime in exactTimes %}
+                                <option value="{{ exactTime }}">{{ exactTime }}</option>
+
+                            {% endfor %}
+                        </select>
+                    </div>
                     {#                    <i class="fas fa-lock prefix grey-text"></i>#}
-
                 </div>
-
-                <div class="md-form mb-4">
-                    <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
-                                                                                           shape</label>
-                    <br>
-                    <select id="defaultForm-shape" name="shape">
-                        <option value="tiny">Very Small</option>
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="large">Large</option>
-                    </select>
-
-                    {#                    <i class="fas fa-lock prefix grey-text"></i>#}
-
-                </div>
-
-
             </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button class="btn btn-default" type='submit' name='button' value="Add">
-                    Login
+            <div class="container">
+                <button class="btn btn-default" type='submit' name='button' value="Add"
+                        style="align-self:center; color:green">
+                    + Add new pill
                 </button>
             </div>
         </form>
-
     {% endblock %}
 
     {% block js_block %}
