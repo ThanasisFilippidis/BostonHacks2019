@@ -113,28 +113,43 @@ class Index(View):
             # message = client.messages.create(
             #     to="+18574729477",
             #     from_="+12029154283",
-            #     body="Gamiesai pou den irthes")
+            #     body="pou den irthes")
             # call = client.calls.create(
-            #     url='http://a5570db5.ngrok.io/remempill/dynamic_call_creator/1',
+            #     url='http://3afbbe04.ngrok.io/dynamic_call_creator/15',
             #     to='+18572874360',
             #     from_='+12029154283'
             # )
 
-            min_time = timezone.now()
-            max_time = min_time - datetime.timedelta(hours=0, minutes=0, seconds=59)
+            # min_time = timezone.now()
+            # max_time = min_time - datetime.timedelta(hours=0, minutes=0, seconds=59)
             # print(min_time)
             # print(max_time)
             # if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(pk=2).time_to_consume <= max_time:
             #     print("prepei")
             # else:
             #     print("den prepei")
-            pill = Pill.objects.get(pk=1)
-            new_cons = PillConsumption(pill=pill, time_to_consume= max_time, consumed=False)
-            new_cons.save()
-            add_to_queue("+18572874360", new_cons)
+            # pill = Pill.objects.get(pk=1)
+            # new_cons = PillConsumption(pill=pill, time_to_consume= max_time, consumed=False)
+            # new_cons.save()
+            # add_to_queue("+18572874360", new_cons)
             #print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
 
             # print(call.sid)
+            consumptions_of_the_hour = get_consumptions_of_the_hour(timezone.now())
+
+            for consumption in consumptions_of_the_hour:
+                target = 'http://3afbbe04.ngrok.io/dynamic_call_creator/' + str(consumption.id)
+                print("tipwnw")
+                print(consumption.pill.owner.phone)
+                call = client.calls.create(
+                    url=target,
+                    to=str(consumption.pill.owner.phone),#'+18572874360',
+                    from_='+12029154283'
+                )
+                message = client.messages.create(
+                    to=str(consumption.pill.owner.phone),
+                    from_="+12029154283",
+                    body=target)
             return HttpResponse('User account exist, please register another one.')
 
 
@@ -243,11 +258,12 @@ def dynamic_call_creator(request, consumption_id):
     resp = VoiceResponse()
 
     # Start our <Gather> verb
-    action = "http://3afbbe04.ngrok.io/remempill/callresponse/" + consumption_id
+    action = "http://3afbbe04.ngrok.io/callresponse/" + consumption_id
     gather = Gather(num_digits=1, actionOnEmptyResult="true", action=action, timeout=10)
     consumption = PillConsumption.objects.get(pk=int(consumption_id))
     pill = consumption.pill
-    saying = 'Hey grandpa! Please press five after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
+    elder = pill.owner
+    saying = elder.greeting_message + '! Please press five after taking your ' + pill.name + ' pill. Just to help you remember, this is a '
     saying += pill.color + ' pill that has a ' + pill.size + ' size ' + ' and its shape is ' + pill.shape
     gather.say(saying)
     resp.append(gather)
@@ -255,7 +271,6 @@ def dynamic_call_creator(request, consumption_id):
     resp.append(say)
 
     print(resp)
-    # return HttpResponse('User account exist, please register another one.')
 
     return HttpResponse(resp)
 
@@ -369,6 +384,7 @@ def get_consumptions_of_the_hour(curr_time):
     for consumption in PillConsumption.objects.all():
         if min_time <= consumption.time_to_consume < max_time:
             consumptions.append(consumption)
+    return consumptions
 
 
 def add_to_queue(phone_number, pill_consumption):
