@@ -59,105 +59,75 @@
 
 
 
-    <div class=" modal fade container-fluid" id="exampleModal" tabindex="-1" role="dialog"
-         aria-labelledby="exampleModalLLabel" aria-hidden="true">
+    <div class="modal fade" id="signIn" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="" method="post">
-                    {#                    <div class="imgcontainer">#}
-                    {#                        <span onclick="document.getElementById('id01').style.display='none'" class="close"#}
-                    {#                              title="Close Modal">&times;</span>#}
-                    {#                        <img src="img_avatar2.png" alt="Avatar" class="avatar">#}
-                    {#                    </div>#}
 
-                    <div class="container">
-                        <div>
-                            <label for="uname"><b>Username</b></label>
-                            <input type="text" placeholder="Enter Username" name="uname" required>
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Sign in</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-body mx-3">
+                        <div class="md-form mb-5">
+                            <i class="fas fa-envelope prefix grey-text"></i>
+                            <input type="email" id="defaultForm-email" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-email">Your email</label>
                         </div>
-                        <div>
-                            <label for="psw"><b>Password</b></label>
-                            <input type="password" placeholder="Enter Password" name="psw" required>
-                        </div>
-                        <div>
-                            <label>
-                                <input type="checkbox" checked="checked" name="remember"> Remember me
-                            </label>
-                            <button type="submit">Login</button>
 
+                        <div class="md-form mb-4">
+                            <i class="fas fa-lock prefix grey-text"></i>
+                            <input type="password" id="defaultForm-pass" class="form-control validate">
+                            <label data-error="wrong" data-success="right" for="defaultForm-pass">Your password</label>
                         </div>
+
                     </div>
-
-                    <div class="container" style="background-color:#f1f1f1">
-                        <button type="button" onclick="document.getElementById('id01').style.display='none'"
-                                class="cancelbtn">Cancel
-                        </button>
-                        <span class="psw">Forgot <a href="#">password?</a></span>
+                    <div class="modal-footer d-flex justify-content-center">
+                        <button class="btn btn-default" type='submit' name='button' value="Login">Login</button>
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
 
-            <div style="display: none">
-                <div class="blog-card justify-content-center">
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                            style="position:absolute; right:5px; z-index: 1;">
+    <div class="modal fade" id="signUp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Sign in</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <div class="container">
-                        <div class="row">
-                            <div class="card-bg col-lg-3 col-md-3 col-sm-3, col-xs-3"></div>
-                            <div class="col-lg-9 col-md-9 col-sm-9, col-xs-9">
-                                <p id='level' class="tagline text-center">
-                                    Level
-                                </p>
-                                <h3 id="short" class="title text-center">
-                                    Name
-                                </h3>
-                                <div class="divider"></div>
-                                <p id="long" class="paragraph text-justify">
-                                    A short description
-                                </p>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="divider"></div>
-                            <div class='container'>
-                                <fieldset id='modalRadio'>
-                                    <div class='cotainer row'>
-                                        <div class='col-lg-4 col-md-4 '>
-                                            <label>
-                                                <input type="radio" name="mtype" value="Avoidance"
-                                                       class="type form-radio" id="avoidancemodal">
-                                            </label> Avoidance
-                                        </div>
-                                        <div class='col-lg-4 col-md-4 '>
-                                            <label>
-                                                <input type="radio" name="mtype" value="Something Else"
-                                                       class="type form-radio" id="othermodal">
-                                            </label> Something Else
-                                        </div>
-                                        <div class='col-lg-4 col-md-4 '>
-                                            <div>
-                                                <button id="modalTip" type="button"
-                                                        class="btn btn-primary randTip">
-                                                    Click for more
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                    </div>
                 </div>
+                <div class="modal-body mx-3">
+                    <div class="md-form mb-5">
+                        <i class="fas fa-envelope prefix grey-text"></i>
+                        <input type="email" id="defaultForm-email" class="form-control validate">
+                        <label data-error="wrong" data-success="right" for="defaultForm-email">Your email</label>
+                    </div>
 
+                    <div class="md-form mb-4">
+                        <i class="fas fa-lock prefix grey-text"></i>
+                        <input type="password" id="defaultForm-pass" class="form-control validate">
+                        <label data-error="wrong" data-success="right" for="defaultForm-pass">Your password</label>
+                    </div>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button class="btn btn-default">Login</button>
+                </div>
             </div>
         </div>
     </div>
+
+
+
+
 
 {% endblock %}
 

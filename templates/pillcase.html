@@ -3,49 +3,41 @@
     {% extends "base.html" %}
     {% load static %}
     {% block head_block %}
-        {% block title %}<title>My Tipsheet</title>{% endblock %}
+        {% block title %}<title> Elder's Pillcase</title>{% endblock %}
         {#    <link rel="stylesheet" href="{% static '/style.css' %}">#}
 
-{#        <link rel="script" href="{% static '/cellTips.js' %}">#}
+        {#        <link rel="script" href="{% static '/cellTips.js' %}">#}
 
-{#        <link rel="stylesheet" href="{% static '/styles/tipsheetstyle.css' %}">#}
+        {#        <link rel="stylesheet" href="{% static '/styles/helpTip.css' %}">#}
         {#    <link rel="stylesheet" href="{% a %}"#}
+
     {% endblock %}
 
 
     {% block body_block %}
-        <div class="container" id="tipsheetname">My Tipsheet</div>
+        <div class="container" id="tipsheetname">User's Pillcase</div>
         <div id="content">
             <table id="tipstable" class="table table-bordered">
                 <thead>
                     <tr id="mainstage">
                         <th></th>
                         {% for day in days %}
-                            <th colspan="{{ state.0 }}" class="text-center">{{ state.1.name }}</th>
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th scope="col" class="text-center">Stage</th>
-                        {% for sub in substates %}
-                            <th scope="col" class="text-center">{{ sub.name }}</th>
+                            <th colspan="{{ day }}" class="text-center">{{ day }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
 
-                    {% for level in selectedPerCell %}
-                        <tr id="stage{{ level.0.level }}">
-                            <th scope="row">{{ level.0.name }}</th>
-                            {% for sub in level.1 %}
+                    {% for time in times %}
+                        <tr id="time{{ time }}">
+                            <th scope="row">{{ time }}</th>
+                            {% for day in days %}
                                 <td>
                                     <div class="inner">
-                                        <div id="cell-{{ level.0.level }}-{{ sub.0.id }}" style="padding-top:5px;">
-                                            {% for item in sub.1 %}
-                                                <p id="tip{{ item.tipid.id }}"
-                                                   class="lvl{{ level.0.level }}">{{ item.tipid.name }}</p>
-                                            {% endfor %}
-                                        </div>
-                                        <div id="{{ level.0.level }}-{{ sub.0.id }}" class="cellTip overlay"
+                                        {% for pill in pillsPerDay.0|get_item:day|get_item:time %}
+                                            <p>{{ pill }}</p>
+                                        {% endfor %}
+                                        <div id="{{ day }}-{{ time }}" class="cellPills overlay"
                                              data-toggle="modal" data-target="#moreView">
 
                                             <p> click for more</p>
@@ -61,6 +53,10 @@
                 </tbody>
             </table>
         </div>
+
+
+
+
 
         <div class="modal fade" id="moreView" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
              aria-hidden="true">
@@ -80,7 +76,7 @@
                                     <h2>Your tips:</h2>
                                 </div>
                                 <div id="selected" class="row">
-                                    <div class=" col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class=" col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                         <div class="card">School friends.<p></p>
                                             <button type="button" class="btn btn"
                                                     style="width:100%; padding: 0; margin: 0; background-color: darkgray; ">
@@ -94,9 +90,48 @@
                                 </div>
                             </div>
                             <div class="celltips col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                {#                                <div class="row">#}
+
+                                <h2>Available pills</h2>
                                 <div class="row">
-                                    <h2>Available Tips:</h2>
+                                    {% for pill in pills %}
+                                        <form method="post" class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <div class="card">
+                                                <div class="info">
+                                                    <h3>
+                                                        {{ pill }}
+                                                    </h3>
+                                                    <p>shape</p>
+                                                    <p>color</p>
+                                                    <p>size</p>
+
+
+                                                    {% csrf_token %}
+                                                    <label data-error="wrong" data-success="right"
+                                                           for="defaultForm-time">Select
+                                                                                  time</label>
+                                                    <select id="defaultForm-time" name="shape">
+                                                        {% for hour in hours|get_times:'Morning' %}
+                                                            <option value="{{ hour }}">{{ hour }}</option>#}
+                                                        {% endfor %}
+                                                    </select>
+
+                                                    <br>
+
+
+                                                </div>
+                                                <button type="submit" class="btn btn-success" name="addPill"
+                                                        value="addPill" style="width:100%; padding: 0; margin: 0; ">
+                                                    Add {{ pill }}
+                                                </button>
+                                            </div>
+
+                                        </form>
+                                    {% endfor %}
                                 </div>
+
+
+                                {#                                </div>#}
 
                                 <div id="celltips" class="row">
 
@@ -108,108 +143,65 @@
                 </div>
             </div>
         </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="modal-body mx-3">
+                <div class="md-form mb-5">
+                    {#                    <i class="fas prefix grey-text"></i>#}
+                    <label data-error="wrong" data-success="right" for="defaultForm-name">Pill's
+                                                                                          name</label>
 
-        <div class="modal fade" id="detailedTip" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="exampleModalLongTitle">Name of a Tip</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-12"><h4>About this Tip:</h4></div>
-                        </div>
-                        <div class="row">
-
-                            <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
-
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                                                   vestibulum
-                                                   massa elit. Curabitur sed condimentum dolor. Pellentesque habitant
-                                                   morbi
-                                                   tristique senectus et netus et malesuada fames ac turpis egestas.
-                                                   Curabitur dignissim accumsan tellus. Pellentesque et libero at tellus
-                                                   fermentum rhoncus quis eu ligula. Fusce in ex ligula. Nullam
-                                                   sollicitudin
-                                                   sagittis mi, a ultrices nisi feugiat et. Suspendisse metus felis,
-                                                   dictum
-                                                   at arcu eget, laoreet auctor erat.
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12"><h4>Getting into more detail:</h4></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
-                                                   et
-                                                   urna ut purus varius consectetur ut vel urna. Duis scelerisque at leo
-                                                   in
-                                                   commodo. Fusce tellus augue, consequat vitae efficitur at, commodo
-                                                   sit
-                                                   amet nulla. Duis accumsan, ex sed luctus molestie, nunc risus pretium
-                                                   dui, vel mollis nunc nulla at felis. Nulla placerat sem quis vehicula
-                                                   vehicula. Aliquam sagittis massa sed elit aliquet, ut lobortis velit
-                                                   suscipit. Proin porta convallis aliquam. Nam nec fringilla tellus.
-                                                   Maecenas porttitor mattis purus. Cras nulla quam, sollicitudin ut
-                                                   purus
-                                                   nec, dictum accumsan purus. Vestibulum molestie, lacus dictum finibus
-                                                   consequat, urna ipsum posuere sem, sit amet luctus justo mi sit amet
-                                                   justo. Nam pulvinar finibus leo, eget volutpat mi elementum vel.
-                                                   Nulla
-                                                   facilisis posuere sem, at tincidunt augue sagittis ut. Integer
-                                                   pharetra
-                                                   augue vitae arcu pellentesque aliquam.
-
-                                                   Cras nec maximus velit. Lorem ipsum dolor sit amet, consectetur
-                                                   adipiscing elit. Nullam laoreet metus sed velit tempor, non gravida
-                                                   lectus tristique. Praesent luctus sem at libero finibus ornare.
-                                                   Maecenas
-                                                   porttitor, augue id egestas cursus, risus metus varius est, ac
-                                                   ultrices
-                                                   lacus ante vitae diam. Nam nisl felis, vehicula quis molestie sit
-                                                   amet,
-                                                   porttitor eget eros. Aliquam mollis, quam non placerat tempor, orci
-                                                   nulla
-                                                   ultrices leo, et dapibus lorem risus sit amet erat. Maecenas sit amet
-                                                   quam condimentum, facilisis lacus vel, molestie turpis. Maecenas ut
-                                                   consectetur ante. Sed nulla velit, egestas ac ultrices posuere,
-                                                   interdum
-                                                   volutpat lectus. Nam ipsum nibh, vulputate vitae convallis at,
-                                                   fringilla
-                                                   et mauris. Phasellus sit amet rhoncus nulla. Aliquam quis imperdiet
-                                                   enim,
-                                                   eu bibendum felis. Duis at ullamcorper felis. Integer ac ante non est
-                                                   ullamcorper varius. Curabitur at neque cursus, posuere est sit amet,
-                                                   elementum elit.Short description about the tip from the database.
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12"><h4>Examples might include:</h4></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <ul>
-                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
-                                    <li>Suspendisse placerat urna a neque sollicitudin facilisis.</li>
-                                    <li>Quisque ac velit a nunc feugiat imperdiet.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-fo oter">
-                        <button type="button" class="btn btn-primary " data-dismiss="modal">Back</button>
+                    <input type="text" id="defaultForm-name" class="form-control validate">
+                    <div class="help-tip">
+                        <p>Give the name of the pill as indicated on the box</p>
                     </div>
                 </div>
-            </div>
-        </div>
 
+                <div class="md-form mb-5">
+                    {#                    <i class="fas prefix grey-text"></i>#}
+                    <label data-error="wrong" data-success="right" for="defaultForm-color">Pill's
+                                                                                           name</label>
+                    <input type="text" id="defaultForm-color" class="form-control validate">
+
+                </div>
+
+                <div class="md-form mb-4">
+                    <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
+                                                                                           shape</label>
+                    <br>
+                    <select id="defaultForm-shape" name="shape">
+                        <option value="round">Round</option>
+                        <option value="oval">Oval</option>
+                        <option value="capsule">Capsel</option>
+                    </select>
+
+                    {#                    <i class="fas fa-lock prefix grey-text"></i>#}
+
+                </div>
+
+                <div class="md-form mb-4">
+                    <label data-error="wrong" data-success="right" for="defaultForm-shape">Pill's
+                                                                                           shape</label>
+                    <br>
+                    <select id="defaultForm-shape" name="shape">
+                        <option value="tiny">Very Small</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+
+                    {#                    <i class="fas fa-lock prefix grey-text"></i>#}
+
+                </div>
+
+
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button class="btn btn-default" type='submit' name='button' value="Add">
+                    Login
+                </button>
+            </div>
+        </form>
 
     {% endblock %}
 
@@ -217,8 +209,8 @@
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
         {% csrf_token %}
 
-{#        <script type='text/javascript' src="{% static 'cellTips.js' %}">#}
-{#        </script>#}
+        <script type='text/javascript' src="{% static 'javascript/pillsHandling.js' %}">
+        </script>
     {% endblock %}
 
     </body>

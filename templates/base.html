@@ -15,6 +15,10 @@
         <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 
         <title>Remempill</title>
+        <link rel="stylesheet" href="{% static '/styles/helpTip.css' %}">
+        <link rel="stylesheet" href="{% static '/styles/pillcase.css' %}">
+        {% block headblock %}
+        {% endblock %}
     </head>
     <body>
         {% block navbar %}
@@ -37,13 +41,13 @@
                         <!-- show unregistered user navbar: -->
                         {% else %}
                             <li class="nav-item">
-                                <a class="nav-link blue" data-toggle="modal" data-target="#exampleModal" href="">Login</a>
-{#                            <button id="otherbtn" type="button" class="btn btn-sm btn-info randTip" data-toggle="modal"#}
-{#            data-target="#exampleModal">something else...#}
-{#    </button>#}
+                                <a class="nav-link blue" data-toggle="modal" data-target="#signIn" href="">Login</a>
+                                {#                            <button id="otherbtn" type="button" class="btn btn-sm btn-info randTip" data-toggle="modal"#}
+                                {#            data-target="#exampleModal">something else...#}
+                                {#    </button>#}
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link red" href="">Register</a>
+                                <a class="nav-link red" data-toggle="modal" data-target="#signIn" href="">Register</a>
                             </li>
                         {% endif %}
                     </ul>

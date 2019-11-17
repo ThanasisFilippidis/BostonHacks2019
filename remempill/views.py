@@ -1,7 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -9,6 +9,8 @@ from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse, Gather, Say
 
 from .models import Pill, PillConsumption
+from django.views.decorators.csrf import csrf_protect
+from django.template.defaulttags import register
 
 
 class Index(View):
@@ -66,6 +68,9 @@ class Index(View):
                     request.session['user_password'] = user_password
                     request.session['user_email'] = user_email
                     # return HttpResponse(user.get_id())
+                    request.session['user_pk'] = user.id
+                    return redirect('index/')
+                    # return HttpResponse(user.get_id())
                 else:
                     error_json = {'error_message': 'User account exist, please register another one.'}
                     # return render(request, 'https://www.facebook.com/', error_json)
@@ -109,22 +114,50 @@ def dynamic_call_creator(request, consumption_id):
     resp.append(say)
 
     print(resp)
+    # return HttpResponse('User account exist, please register another one.')
 
     return HttpResponse(resp)
 
 
-def pillcase(request, consumption_id):
+@register.filter
+def get_item(dictionary, key):
+    if not dictionary:
+        return []
+    print(dictionary)
+    return dictionary.get(key)
+
+
+@register.filter
+def get_times(dictionary, key):
+    print(key)
+    print("key is ", key)
+    print(dictionary.get(key))
+    return dictionary.get(key)
+
+
+hours = []
+
+
+def pillcase(request):
     return render(request, '../templates/pillcase.html',
-                  {'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday']},
-                  'times')
+                  {'days': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday ', 'Saturday', 'Sunday'],
+                   'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': ['pill1', 'pill2'],
+                   'pillsPerDay': [{'Monday': {'Noon': ['pill1', 'pill2'], 'Morning': ['pill1', 'pill2'],
+                                               'Afternoon': [], 'Before Bed': []}}],
+                   'hours': {'Morning': ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00'],
+                             'Noon': ['12:00', '13:00', '14:00'],
+                             'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
+                             'Before Bed': ['20:00', '21:00', '22:00', '23:00', '00:00']}})
 
 
 @csrf_exempt
 def callresponse(request, consumption_id):
-    #print("ELA RE MALAKA")
-    #print(request.POST['Digits'])
+    # print("ELA RE MALAKA")
+    # print(request.POST['Digits'])
     if len(request.POST['Digits']) > 0:
         consumption = PillConsumption.objects.get(pk=consumption_id)
         consumption.set_consumed()
-        return HttpResponse('<Response><Say>I see you took your pill. Thats great, I will call you again soon!</Say></Response>')
-    return HttpResponse('<Response><Say>I see that you did not take your pill. I will call you back soon</Say></Response>')
+        return HttpResponse(
+            '<Response><Say>I see you took your pill. Thats great, I will call you again soon!</Say></Response>')
+    return HttpResponse(
+        '<Response><Say>I see that you did not take your pill. I will call you back soon</Say></Response>')

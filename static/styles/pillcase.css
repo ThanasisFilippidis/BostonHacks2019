@@ -1,0 +1,270 @@
+.table {
+    font-family: 'Roboto', sans-serif;
+}
+
+#stage1 {
+    background-color: #F8E4E4;
+}
+
+#stage2 {
+    background-color: #F8ECD7;
+}
+
+#stage3 {
+    background-color: #EAEDDC;
+}
+
+#stage4 {
+    background-color: #E2EFDF;
+}
+
+#stage5 {
+    background-color: #E6EAF4;
+}
+
+.lvl1 {
+    border-left: 4px solid #d04949;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.lvl2 {
+    border-left: 4px solid #dda23c;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.lvl3 {
+    border-left: 4px solid #a4b167;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.lvl4 {
+    border-left: 4px solid #74b266;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.lvl5 {
+    border-left: 4px solid #6079b9;
+    text-align: center;
+    margin-left: 5px;
+
+}
+
+#mainstage {
+    background-color: white;
+    text-align: center;
+    font-weight: normal;
+}
+
+#action {
+    background-color: white;
+}
+
+#tipsheetname {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 22pt;
+    text-align: center;
+    padding-bottom: 10pt;
+    padding-top: 15pt;
+}
+
+#btn-tp {
+    color: black;
+    width: 100%;
+    border-left-color: red;
+}
+
+#btn-s2 {
+    color: black;
+    width: 100%;
+    border-left-color: orange;
+}
+
+.modal {
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    position: relative;
+
+}
+
+td p {
+    margin-bottom: 1vmax;
+}
+
+th {
+    text-align: center !important;
+    padding: 1em !important;
+    vertical-align: middle !important;
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 140, 186, 0.95);
+    overflow: hidden;
+    width: 100%;
+    height: 0;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.overlay p {
+    /*font-size: x-large;*/
+    color: white;
+    border: 2px solid white;
+    text-align: center;
+    vertical-align: middle;
+    /*padding: 10%;*/
+    display: table-cell;
+    margin-bottom: -1px !important;
+}
+
+tr, th {
+    font-size: 1.25vmax !important;
+}
+
+td:hover .inner .overlay {
+    height: 100%;
+    display: table;
+}
+
+/*td:hover .inner .overlay p {*/
+/*display: table-cell;*/
+/*}*/
+
+.text {
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#content {
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}
+
+#content table {
+    width: 100%;
+    height: 100%;
+    table-layout: fixed;
+}
+
+#content table tr {
+    width: 100%;
+    height: 100%;
+}
+
+#content table td {
+    width: 100%;
+    height: 100%;
+    padding: 0 !important;
+}
+
+.inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.row {
+    margin: 5px -5px;
+    text-align: center;
+}
+
+.row h1, h2 {
+    width: 100%;
+}
+
+.celltips, .selected {
+    border: solid darkgray 1px;
+    margin-bottom: 10px;
+}
+
+.celltips {
+    background-color: darkseagreen;
+}
+
+.selected {
+    background-color: aliceblue;
+}
+
+.selected p {
+    width: 100%;
+}
+
+.celltips p {
+    /*width: 100%;*/
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+    padding: 16px;
+    text-align: center;
+    display: flex;
+    background-color: #f1f1f1;
+    max-height: 250px;
+    border-radius: 0;
+    border: none;
+    margin: 10px !important;
+
+}
+
+.info {
+    overflow-y: scroll !important
+}
+
+.card p {
+    max-height: 120px;
+    overflow: auto;
+    text-align: left;
+}
+
+.card h3 {
+    height: 50px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.more, .addition, .deletion {
+    width: 100%;
+    border: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0 !important;
+
+}
+
+.more {
+    background-color: darkgray;
+    position: relative;
+    bottom: -2px
+}
+
+.buttons {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    right: 0;
+}
