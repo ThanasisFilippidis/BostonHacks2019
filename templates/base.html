@@ -21,7 +21,7 @@
         {% endblock %}
     </head>
     <body>
-        <p>{{ user.user_name }}</p>
+        <p>{{ user }}</p>
         {% block navbar %}
             <nav class="site-header sticky-top py-1 navbar navbar-light navbar-expand-md justify-content-center nav-style">
                 <a class="navbar-brand d-flex w-50 mr-auto"><span
@@ -32,12 +32,12 @@
                 <div class="navbar-collapse collapse w-100" id="collapse">
                     <ul class="nav navbar-nav ml-auto w-100 justify-content-end">
                         <!-- Show login navbar: -->
-                        {% if not user %}
+                        {% if user %}
                             <li class="nav-item">
                                 <a class="nav-link" href="" id="tipsheet">My Tipsheet</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                                <a class="nav-link" href="{% url 'mylogout' %}">Logout</a>
                             </li>
                         <!-- show unregistered user navbar: -->
                         {% else %}

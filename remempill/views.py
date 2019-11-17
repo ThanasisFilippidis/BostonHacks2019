@@ -2,6 +2,7 @@ from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -17,7 +18,9 @@ class Index(View):
     template_name = '../templates/index.html'
 
     def get(self, request):
-        return render(request, self.template_name, context={'user': 'user'})
+        if not user_session_check(request):
+            return render(request, self.template_name, context={'user': ""})
+        return render(request, self.template_name, context={'user': request.session['user_name']})
 
     @method_decorator(csrf_protect)
     def post(self, request):
@@ -36,15 +39,20 @@ class Index(View):
                 # response = HttpResponseRedirect('https://www.google.com/maps')
                 # set cookie to transfer user name to login success page.
                 # response.set_cookie('user_name', user_name, 3600)
+                request.session['user_name'] = user.username
                 content = {'message': 'Hello, World!'}
+                print("EDW")
                 print(user)
-                return render(request, self.template_name, context={'user': user})
+                user_name = auth.get_user(request).username
+                request.session['user_name'] = user_name
+                #print(type(user_name))
+                return render(request, self.template_name, {'user': user_name})
                 # return HttpResponse(user.get_id())
             else:
                 error_json = {'error_message': 'User name or password is not correct.'}
                 # return render(request, 'https://www.facebook.com/', error_json)
                 # content = {'message': 'Wrong password!'}
-                return render('', context={'user': None})
+                return render('index', context={'user': ""})
         # post request for Registering a new user
         elif request.POST['button'] == "Register":
             print("ELA MWRE2")
@@ -74,8 +82,7 @@ class Index(View):
                     request.session['user_password'] = user_password
                     request.session['user_email'] = user_email
                     # return HttpResponse(user.get_id())
-                    request.session['user_pk'] = user.id
-                    return redirect('')
+                    return redirect('index')
                     # return HttpResponse(user.get_id())
                 else:
                     error_json = {'error_message': 'User account exist, please register another one.'}
@@ -170,7 +177,20 @@ def callresponse(request, consumption_id):
 
 
 @csrf_exempt
-def logout(request):
+def mylogout(request):
+    template_name = '../templates/index.html'
+    request.session['user_name'] = ""
     auth.logout(request)
-    # return redirect('/')
-    return HttpResponseRedirect('/remempill')
+    return redirect('index')
+    #return HttpResponseRedirect('/remempill')
+    #return render(request, template_name, context={'user': ""})
+    #return HttpResponseRedirect(reverse('index'))
+
+
+def user_session_check(request):
+    #get current user's details and check if he is logged in indeed
+    try:
+        return request.session['user_name']
+    except KeyError:
+        return None
+
