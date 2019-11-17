@@ -17,6 +17,16 @@ from django.template.defaulttags import register
 
 import datetime
 
+from redis import Redis
+from rq_scheduler import Scheduler
+
+
+# Open a connection to your Redis server.
+redis_server = Redis(host="localhost", port=6379)
+
+# Create a scheduler object with your Redis server.
+scheduler = Scheduler(connection=redis_server)
+
 
 class Index(View):
     template_name = '../templates/index.html'
@@ -109,17 +119,20 @@ class Index(View):
             #     to='+18572874360',
             #     from_='+12029154283'
             # )
-            print("EEEEEEEEEE")
+
             min_time = timezone.now()
-            max_time = min_time + datetime.timedelta(hours=0, minutes=59, seconds=59)
-            print(min_time)
-            print(max_time)
-            if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(
-                    pk=2).time_to_consume <= max_time:
-                print("prepei")
-            else:
-                print("den prepei")
-            # print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
+            max_time = min_time - datetime.timedelta(hours=0, minutes=0, seconds=59)
+            # print(min_time)
+            # print(max_time)
+            # if PillConsumption.objects.get(pk=2).time_to_consume >= min_time and PillConsumption.objects.get(pk=2).time_to_consume <= max_time:
+            #     print("prepei")
+            # else:
+            #     print("den prepei")
+            pill = Pill.objects.get(pk=1)
+            new_cons = PillConsumption(pill=pill, time_to_consume= max_time, consumed=False)
+            new_cons.save()
+            add_to_queue("+18572874360", new_cons)
+            #print(str(PillConsumption.objects.get(pk=1).time_to_consume.day) + str(curr_time))
 
             # print(call.sid)
             return HttpResponse('User account exist, please register another one.')
@@ -141,7 +154,7 @@ class Pillcase(View):
                  '17:00', '18:00', '19:00' '20:00', '21:00', '22:00', '23:00', '00:00']
 
         for day in days:
-            for hour in hours:
+            for hour in times:
                 for pill in toBeConsumed:
                     print(pill.time_to_consume)
 
@@ -179,12 +192,50 @@ class Pillcase(View):
         print(newPill)
         newPill.save()
 
-        days = request.POST.get('days')
-        times = request.POST.get('times')
+        days = request.POST.get('days')#[Monday,..]
+        times = request.POST.get('times')#[20:00...]
+
+        int_days = days_to_num(days)
+        int_hours = intify_hours(times)
+
+        today = datetime.datetime(2019, 11, 17)
+
+        for day in int_days:
+            for hour in int_hours:
+                t_delta = today + datetime.timedelta(hours=day*24 + hour, minutes=0, seconds=0)
+                new_pill_consumption = PillConsumption(pill=newPill, time_to_consume=t_delta)
+                print(new_pill_consumption)
 
         target = "/pillcase/" + str(elder_id)
 
         return redirect(target)
+
+
+def intify_hours(hours):
+    int_hours = []
+    for hour in hours:
+        int_hours.append(int(hour[0:2]))
+    return int_hours
+
+
+def days_to_num(days):
+    days_enumered = []
+    for day in days:
+        if day == "Monday":
+            days_enumered.append(1)
+        if day == "Tuesday":
+            days_enumered.append(2)
+        if day == "Wednesday":
+            days_enumered.append(3)
+        if day == "Thursday":
+            days_enumered.append(4)
+        if day == "Friday":
+            days_enumered.append(5)
+        if day == "Saturday":
+            days_enumered.append(6)
+        if day == "Sunday":
+            days_enumered.append(0)
+    return days_enumered
 
 
 @csrf_exempt
@@ -192,7 +243,7 @@ def dynamic_call_creator(request, consumption_id):
     resp = VoiceResponse()
 
     # Start our <Gather> verb
-    action = "http://a5570db5.ngrok.io/remempill/callresponse/" + consumption_id
+    action = "http://3afbbe04.ngrok.io/remempill/callresponse/" + consumption_id
     gather = Gather(num_digits=1, actionOnEmptyResult="true", action=action, timeout=10)
     consumption = PillConsumption.objects.get(pk=int(consumption_id))
     pill = consumption.pill
@@ -225,9 +276,6 @@ def get_times(dictionary, key):
     return dictionary.get(key)
 
 
-hours = []
-
-
 # def pillcase(request):
 #
 # def pillcase(request, elder_id):
@@ -249,7 +297,6 @@ hours = []
 
 @csrf_exempt
 def callresponse(request, consumption_id):
-    # print("ELA RE MALAKA")
     # print(request.POST['Digits'])
     if len(request.POST['Digits']) > 0:
         consumption = PillConsumption.objects.get(pk=consumption_id)
@@ -303,9 +350,6 @@ def mylogout(request):
     request.session['user_name'] = ""
     auth.logout(request)
     return redirect('index')
-    # return HttpResponseRedirect('/remempill')
-    # return render(request, template_name, context={'user': ""})
-    # return HttpResponseRedirect(reverse('index'))
 
 
 def user_session_check(request):
@@ -314,3 +358,43 @@ def user_session_check(request):
         return request.session['user_name']
     except KeyError:
         return None
+
+
+def get_consumptions_of_the_hour(curr_time):
+    min_time = curr_time
+    max_time = min_time + datetime.timedelta(hours=0, minutes=59, seconds=59)
+    consumptions = []
+    # print(min_time)
+    # print(max_time)
+    for consumption in PillConsumption.objects.all():
+        if min_time <= consumption.time_to_consume < max_time:
+            consumptions.append(consumption)
+
+
+def add_to_queue(phone_number, pill_consumption):
+    # Add this phone number to Redis associated with "lat,lon"
+    redis_server.set(phone_number, '{}'.format(pill_consumption.id))
+
+    # Get the datetime object representing the next ISS flyby for this number.
+    consumption_datetime = pill_consumption.time_to_consume
+
+    print("I will kick off at: " + str(consumption_datetime))
+
+    scheduler.enqueue_at(consumption_datetime,
+                         notify_subscriber, phone_number)
+
+    # print('{} will be notified when ISS passes by {}, {}'
+    #       .format(phone_number, lat, lon))
+
+    # if next_pass_datetime:
+    #     # Schedule a text to be sent at the time of the next flyby.
+    #     scheduler.enqueue_at(next_pass_datetime,
+    #                          notify_subscriber, phone_number)
+    #
+    #     print('{} will be notified when ISS passes by {}, {}'
+    #           .format(phone_number, lat, lon))
+
+
+def notify_subscriber(phone_number):
+    print('Look up! You may not be able to see it, but the International'
+          ' Space Station is passing above you right now!' + str(phone_number))
