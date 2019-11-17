@@ -85,6 +85,9 @@ class CareTaker(AbstractBaseUser):
     def get_id(self):
         return self.id
 
+    def get_elders(self):
+        return GrandParent.objects.filter(care_taker=self)
+
     # def update_total_playlists(self, number):
     #     self.total_inserted_playlists_number = number
     #     self.save(update_fields=["total_inserted_playlists_number"])
@@ -97,6 +100,7 @@ class GrandParent(models.Model):
     name = models.CharField(max_length=30)
     surname = models.CharField(max_length=30)
     phone = models.CharField(max_length=17, blank=True, default="")
+    greeting_message = models.CharField(max_length=256, default="")
 
     care_taker = models.ForeignKey(CareTaker, on_delete=models.CASCADE, related_name='grandparent')
 
@@ -136,6 +140,11 @@ class Pill(models.Model):
 class PillConsumption(models.Model):
     pill = models.ForeignKey(Pill, on_delete=models.CASCADE, related_name="pill_consumption")
     time_to_consume = models.DateTimeField(null=True, blank=True)
+    consumed = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.pill) + " " + str(self.time_to_consume)
+
+    def set_consumed(self):
+        self.consumed = True
+        self.save(update_fields=["consumed"])

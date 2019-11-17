@@ -9,6 +9,8 @@ urlpatterns = [
     # path('', views.index, name='index'),
     path('pillcase', views.pillcase, name="pillcase"),
     path('', Index.as_view()),
+    path('callresponse/<str:consumption_id>', views.callresponse, name="callresponse"),
+    path('dynamic_call_creator/<str:consumption_id>', views.dynamic_call_creator, name="dynamic_call_creator"),
 ]
 
 admin.site.site_header = 'RememPill Administration Site'
