@@ -21,6 +21,7 @@ class Index(View):
 
     @method_decorator(csrf_protect)
     def post(self, request):
+        print("ELA MWRE")
         # post request for Login existing user
         if request.POST['button'] == "Login":
             user_email = request.POST.get('user_email', '')
@@ -44,14 +45,17 @@ class Index(View):
                 # return Response(content)
         # post request for Registering a new user
         elif request.POST['button'] == "Register":
+            print("ELA MWRE2")
             user_name = request.POST.get('user_name', '')
             user_password = request.POST.get('user_password', '')
             user_email = request.POST.get('user_email', '')
             if len(user_name) > 0 and len(user_password) > 0 and len(user_email) > 0:
+                print("ELA MWRE3")
                 # check whether user account exist or not.
                 user = auth.authenticate(request, username=user_name, password=user_password)
                 # if user account do not exist.
                 if user is None:
+                    print("ELA MWRE4")
                     # create user account and return the user object.
                     user = get_user_model().objects.create_user(username=user_name, password=user_password,
                                                                 email=user_email)
@@ -161,3 +165,9 @@ def callresponse(request, consumption_id):
             '<Response><Say>I see you took your pill. Thats great, I will call you again soon!</Say></Response>')
     return HttpResponse(
         '<Response><Say>I see that you did not take your pill. I will call you back soon</Say></Response>')
+
+
+@csrf_exempt
+def logout(request):
+    auth.logout(request)
+    return redirect('index/')
