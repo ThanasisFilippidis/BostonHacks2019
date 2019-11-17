@@ -22,7 +22,7 @@
                               style="border: 2px solid lightgray; padding: 10px;">
                             {% csrf_token %}
 {#                            <div >#}
-                                <h4>{{ profile.name }} {{ profile.surname }} {{ profile.id }}</h4>
+                                <h4>{{ profile.name }} {{ profile.surname }}</h4>
                                 <button class="btn btn-default" type="submit" name="button"
                                         style="background-color: lightgray" value={{ profile.id }}>More
                                 </button>

@@ -35,8 +35,9 @@
                             {% for day in days %}
                                 <td>
                                     <div class="inner">
-                                        {% for pill in pillsPerDay.0|get_item:day|get_item:time %}
-                                            <p>{{ pill }}</p>
+{#                                    {{ day }}#}
+                                        {% for pill in pillsPerDay|get_item:day|get_item:time %}
+                                            {{ pill }}
                                         {% endfor %}
                                         <div id="{{ day }}-{{ time }}" class="cellPills overlay"
                                              data-toggle="modal" data-target="#moreView">

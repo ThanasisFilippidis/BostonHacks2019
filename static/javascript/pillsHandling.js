@@ -16,7 +16,7 @@ function add(){
 $(document).ready(function () {
 
     $('.cellPills').on('click', function (event) {
-        alert("hi")
+        // alert("hi")
         // moreView(this);
 
     });

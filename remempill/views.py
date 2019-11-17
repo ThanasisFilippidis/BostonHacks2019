@@ -148,7 +148,7 @@ class Pillcase(View):
         toBeConsumed = []
         for item in pills:
             print(item.name)
-            temp = PillConsumption.objects.filter(pill=item).filter(time_to_consume__day='Monday')
+            temp = PillConsumption.objects.filter(pill=item)
             for ite in temp:
                 toBeConsumed.append(ite)
 
@@ -156,24 +156,30 @@ class Pillcase(View):
         times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
                  '17:00', '18:00', '19:00' '20:00', '21:00', '22:00', '23:00', '00:00']
 
-        print("lala", toBeConsumed)
+        reverse = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+        # print("lala", toBeConsumed)
         pillsPerDay = {}
         for day in days:
-            day = []
+            dayss = {}
             for hour in times:
-                hour = []
+                hourss = []
                 for pill in toBeConsumed:
-                    print(pill.time_to_consume.weekday())
-
+                    # print("AAAAAAAAAAAAAAAAA", pill.time_to_consume.hour)
+                    if reverse[pill.time_to_consume.weekday()] == day and pill.time_to_consume.hour == int(hour[0:2]):
+                        hourss.append(pill.pill)
+                dayss[hour] = hourss
+            pillsPerDay[day] = dayss
+        print("AAAAAAAAAAAAAAAAAAAAAA")
+        print(pillsPerDay)
+        print("AAAAAAAAAAAAAAAAAAAAAA")
         elder = GrandParent.objects.get(id=elder_id)
-        print(elder)
+        # print(elder)
 
         return render(request, '../templates/pillcase.html',
                       {'user': elder,
                        'days': days,
                        'times': ['Morning', 'Noon', 'Afternoon', 'Before Bed'], 'pills': pills,
-                       'pillsPerDay': [{'Monday': {'Noon': ['1', '1'], 'Morning': ['1', '1'],
-                                                   'Afternoon': [], 'Before Bed': []}}],
+                       'pillsPerDay': pillsPerDay,
                        'hours': {'Morning': ['06:00', '07:00', '08:00', '09:00', '10:00', '12:00'],
                                  'Noon': ['12:00', '13:00', '14:00'],
                                  'Afternoon': ['15:00', '16:00', '17:00', '18:00', '19:00'],
@@ -274,9 +280,15 @@ def dynamic_call_creator(request, consumption_id):
 
 @register.filter
 def get_item(dictionary, key):
+    print("key is: ", key)
+    if key == '06:00':
+        print("AHSOOAISHAOSHOHSAOHASOHSAOHASOHASOHAS\n\n\n\n\n\n")
     if not dictionary:
-        return []
-    # print(dictionary)
+        if dictionary is not None:
+            dictionary = dict(dictionary)
+        else:
+            return []
+    print(dictionary.get(key))
     return dictionary.get(key)
 
 
@@ -285,7 +297,16 @@ def get_times(dictionary, key):
     # print(key)
     # print("key is ", key)
     # print(dictionary.get(key))
+
     return dictionary.get(key)
+
+
+@register.filter
+def get_pill(dictionary, key1, key2):
+    if not dictionary:
+        return []
+
+    return dictionary.get(key1).get(key2)
 
 
 # def pillcase(request):
