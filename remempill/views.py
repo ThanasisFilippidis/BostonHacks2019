@@ -37,6 +37,7 @@ class Index(View):
                 # set cookie to transfer user name to login success page.
                 # response.set_cookie('user_name', user_name, 3600)
                 content = {'message': 'Hello, World!'}
+                return render('', user)
                 # return HttpResponse(user.get_id())
             else:
                 error_json = {'error_message': 'User name or password is not correct.'}
@@ -73,7 +74,7 @@ class Index(View):
                     request.session['user_email'] = user_email
                     # return HttpResponse(user.get_id())
                     request.session['user_pk'] = user.id
-                    return redirect('index/')
+                    return redirect('')
                     # return HttpResponse(user.get_id())
                 else:
                     error_json = {'error_message': 'User account exist, please register another one.'}
