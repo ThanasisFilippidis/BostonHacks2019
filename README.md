@@ -1,3 +1,6 @@
+## Abstract
+RememPill - a web-app that can be used to notify elder people that may not be so proud of their memory about when they should take their medication using phone calls and text-to-speech dynamically created messages. Serves as well as a tool for their care taker so they can feel safe about their beloved ones. This application was developed by the two contributors as our hack for BostonHacks2019 in 22 hours of coding.
+
 ## Inspiration
 Both me and my teammate have grandparents who suffer from either memory loss or Alzheimer's. In any case, people afflicted with memory health problems are always hard to take care of and need constant attention in order to take their medication on time. Most of the time this is extremely hard for the afflicted members and requires too much time. It can also be quite expensive in the case of professionals caregivers. Of course, there are cases where the elder needs the constant attention but there are lots of scenarios where the elder can function quite enough on their own. That's how we came up with the idea of RememPill, a way to ease the load on families and provide assistance to elder people.
 ## What it does
